@@ -3,8 +3,9 @@ def buildStringCombos(string: str):
     for index in range(len(string)):
         for index2 in range(len(string)):
             if string[index:index2]:
-                if string[index:index2+1] not in stringSplices:
-                    stringSplices.append(string[index:index2+1])
+                newString = string[index:index2+1]
+                if newString not in stringSplices:
+                    stringSplices.append(newString)
     strings = []
     for i in range(0, len(stringSplices)-1, 2):
         strings.append(stringSplices[i+1])
@@ -12,10 +13,21 @@ def buildStringCombos(string: str):
     return strings
 
 
+def countOccurences(string:str, target:str):
+    count = 0
+    while target in string:
+        string = string.replace(target, "", 1)
+        count += 1
+    return count
+
+
 def removeDuplicateString(string: str):
     print(f"FUNCTION removeDuplicateString ENTER__________________{string}")
-    stringCombos = buildStringCombos(string)[0]
-    proposals = list()
+    stringCombos = buildStringCombos(string)
+    stringCombos = list(filter(lambda x: (countOccurences(string=string, target=x) > 1), stringCombos))
+    stringCombos.sort(key=lambda x: len(x))
+    stringCombos.reverse()
+    proposals = []
     for target in stringCombos:
         scanned = string
         reversed_scan = list(scanned)
@@ -24,15 +36,15 @@ def removeDuplicateString(string: str):
         reversed_target = list(target)
         reversed_target.reverse()
         reversed_target = "".join(reversed_target)
+        proposal = scanned
         print(f"\nTarget: {target}\nScanned: {scanned}\nReversed: {reversed_scan}\nReversed Target: {reversed_target}")
-        proposal = list(reversed_scan.replace(reversed_target, "", 1))
-        proposal.reverse()
-        proposal = "".join(proposal)
-        proposals.append(proposal)
-        return proposal
-    proposals = list(proposals)
-    proposals.sort(key=lambda x: len(x))
-    return proposals
+        if countOccurences(target=reversed_target,string=reversed_scan) > 1:
+            proposal = list(reversed_scan.replace(reversed_target, "", 1))
+            proposal.reverse()
+            proposal = "".join(proposal)
+        if proposal not in proposals:
+            proposals.append(proposal)
+            return proposal
 
 
-print(removeDuplicateString("9questMappin our 9questMan"))
+print(removeDuplicateString("pin famour fam 9questMa"))
